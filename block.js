@@ -1,9 +1,9 @@
-goog.provide('soft_eng.Block');
+goog.provide('Block');
 
-soft_eng.Block = function(pos, world)
+Block = function(pos, world)
 {
 	var self = this;
-	var cellSize = soft_eng.Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
+	var cellSize = Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
 	
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = 0.1;
@@ -21,11 +21,11 @@ soft_eng.Block = function(pos, world)
 	this.body.CreateFixture(this.fixDef);
 	
 	// add a tag to the body object to represent the maze object type (goal, block, trap, ball)
-	var data = { "tag": MazeEnum.BLOCK };
+	var data = { "tag": GameObj.BLOCK };
 	this.body.SetBullet(true);
 	this.body.SetUserData(data);
 	this.sprite = (new lime.Sprite)
 		.setFill('assets/pillars.png')
-		.setSize(cellSize * soft_eng.SCALE, cellSize * soft_eng.SCALE)
-		.setPosition(this.body.GetWorldCenter().x * soft_eng.SCALE, this.body.GetWorldCenter().y * soft_eng.SCALE);
+		.setSize(cellSize * SCALE, cellSize * SCALE)
+		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
 }

@@ -1,8 +1,8 @@
-goog.provide('soft_eng.Goal');
+goog.provide('Goal');
 
-soft_eng.Goal = function(pos, world)
+Goal = function(pos, world)
 {
-	var radius = soft_eng.Constants.cellSize/4;
+	var radius = Constants.cellSize/4;
 	var self = this;
 	var space = 0.535; // space allocated for each maze block (in a 28x20 maze)
 	
@@ -21,11 +21,11 @@ soft_eng.Goal = function(pos, world)
 	this.body.CreateFixture(this.circleDef);
 	
 	// add a tag to the body object to represent the maze object type (goal, block, trap, ball)
-	var data = { "tag": MazeEnum.GOAL };
+	var data = { "tag": GameObj.GOAL };
 	this.body.SetUserData(data);
 	
 	this.sprite = (new lime.Circle)
 		.setFill('assets/goal.png')
-		.setSize(soft_eng.Constants.cellSize * soft_eng.SCALE, soft_eng.Constants.cellSize * soft_eng.SCALE)
-		.setPosition(this.body.GetWorldCenter().x * soft_eng.SCALE, this.body.GetWorldCenter().y * soft_eng.SCALE);
+		.setSize(Constants.cellSize * SCALE, Constants.cellSize * SCALE)
+		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
 }

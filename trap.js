@@ -1,10 +1,10 @@
-goog.provide('soft_eng.Trap');
+goog.provide('Trap');
 
-soft_eng.Trap = function(pos, world)
+Trap = function(pos, world)
 {
 	var self = this;
-	var radius = soft_eng.Constants.cellSize/4; // space allocated for each maze block (in a 28x20 maze)
-	var cellSize = soft_eng.Constants.cellSize;
+	var radius = Constants.cellSize/4; // space allocated for each maze block (in a 28x20 maze)
+	var cellSize = Constants.cellSize;
 	this.circleDef = new b2FixtureDef;
 	this.circleDef.shape = new b2CircleShape(radius/2);
 	this.circleDef.density = 0.1;
@@ -20,11 +20,11 @@ soft_eng.Trap = function(pos, world)
 	this.body.CreateFixture(this.circleDef);
 	
 	// add a tag to the body object to represent the maze object type (goal, block, trap, ball)
-	var data = { "tag": MazeEnum.TRAP };
+	var data = { "tag": GameObj.TRAP };
 	this.body.SetUserData(data);
 	
 	this.sprite = (new lime.Circle())
 		.setFill("assets/deathhole.png")
-		.setSize(cellSize * soft_eng.SCALE * 0.95, cellSize * soft_eng.SCALE * 0.95)
-		.setPosition(this.body.GetWorldCenter().x * soft_eng.SCALE, this.body.GetWorldCenter().y * soft_eng.SCALE);
+		.setSize(cellSize * SCALE * 0.95, cellSize * SCALE * 0.95)
+		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
 }

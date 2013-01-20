@@ -1,10 +1,10 @@
-goog.provide('soft_eng.Crank');
+goog.provide('Crank');
 
 // DOES NOT WORK AT ALL, NO SPRITES BOUND
-soft_eng.Crank = function(pos, world)
+Crank = function(pos, world)
 {
 	var self = this;
-	var cellSize = soft_eng.Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
+	var cellSize = Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
 
 	// Define crank.
 	var sd = new b2BoxDef();
@@ -72,7 +72,7 @@ soft_eng.Crank = function(pos, world)
 	//this.body.CreateFixture(this.fixDef);
 	
 	// add a tag to the body object to represent the maze object type (goal, block, trap, ball)
-	var data = { "tag": MazeEnum.CRANK };
+	var data = { "tag": GameObj.CRANK };
 	this.body.SetUserData(data);
 	
 }

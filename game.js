@@ -1,34 +1,34 @@
-goog.provide('soft_eng.Game');
+goog.provide('Game');
 
-goog.require('soft_eng.Ball');
-goog.require('soft_eng.Goal');
-goog.require('soft_eng.Trap');
-goog.require('soft_eng.Block');
-goog.require('soft_eng.Bumper');
-goog.require('soft_eng.Blocker');
-goog.require('soft_eng.EnemyBall');
-goog.require('soft_eng.Spinner');
-goog.require('soft_eng.Constants');
-goog.require('soft_eng.WorldListener');
-goog.require('soft_eng.WorldListener');
+goog.require('Ball');
+goog.require('Goal');
+goog.require('Trap');
+goog.require('Block');
+goog.require('Bumper');
+goog.require('Blocker');
+goog.require('EnemyBall');
+goog.require('Spinner');
+goog.require('Constants');
+goog.require('WorldListener');
+goog.require('WorldListener');
 goog.require("Levels");
 
 // entrypoint
-soft_eng.Game = function(director, level) {
+Game = function(director, level) {
     
     var deviceName = navigator.userAgent.toLowerCase();
     
     var FRAME_RATE = 60;
 
     if (level % Levels.length == 2) {
-        soft_eng.SCALE = 30.0;
+        SCALE = 30.0;
     } else {
-        soft_eng.SCALE = 60.0;
+        SCALE = 60.0;
     }
 	console.log("begin");
 	var startDate = new Date();
 	// maze object type enum
-	MazeEnum = {
+	GameObj = {
 		"EMPTY": 0, 
 		"BALL": 1, 
 		"GOAL": 2, 
@@ -62,8 +62,8 @@ soft_eng.Game = function(director, level) {
     var addBackgroundToScene = function (scene) {
 		var bgSize = 32;
 
-		for (var x = 0; x < soft_eng.WIDTH + bgSize; x += bgSize) {
-			for (var y = 0; y < soft_eng.HEIGHT + bgSize; y += bgSize) {
+		for (var x = 0; x < WIDTH + bgSize; x += bgSize) {
+			for (var y = 0; y < HEIGHT + bgSize; y += bgSize) {
 				var bgSprite = new lime.Sprite()
 					.setSize(bgSize, bgSize)
 					.setFill("assets/tile.png")
@@ -99,7 +99,7 @@ soft_eng.Game = function(director, level) {
     this.getBalls = function() { return balls; };
     this.addBall = function(pos) {
         // Ball
-        var b = new soft_eng.Ball(pos, world);
+        var b = new Ball(pos, world);
         balls.push(b);
         lime.scheduleManager.setDisplayRate(1000/FRAME_RATE/balls.length);
         layer.appendChild(b.sprite);
@@ -115,7 +115,7 @@ soft_eng.Game = function(director, level) {
     }
 	var startGame = function() {
         console.log("Entering Maze loop");
-        var cellSize = soft_eng.Constants.cellSize;
+        var cellSize = Constants.cellSize;
         var maze = Levels[level % Levels.length];
         for(var col = 0; col < maze.length; col++) {
             for(var row = 0; row < maze[col].length; row++) {
@@ -123,28 +123,28 @@ soft_eng.Game = function(director, level) {
                 pos.x = row * cellSize + cellSize/2;
                 pos.y = col * cellSize + cellSize/2;
                 var obj;
-                if (maze[col][row] == MazeEnum.BALL) {
+                if (maze[col][row] == GameObj.BALL) {
                     self.addBall(pos);
-                } else if (maze[col][row] == MazeEnum.GOAL) {
-                    obj = new soft_eng.Goal(pos, world);
-                } else if (maze[col][row] == MazeEnum.TRAP) {
-                    var obj = new soft_eng.Trap(pos, world);
-                } else if (maze[col][row] == MazeEnum.BLOCK) {
-                    obj = new soft_eng.Block(pos, world);
-                } else if (maze[col][row] == MazeEnum.SPINNER_CW) {
-                    obj = new soft_eng.Spinner(pos, world, 'cw');
+                } else if (maze[col][row] == GameObj.GOAL) {
+                    obj = new Goal(pos, world);
+                } else if (maze[col][row] == GameObj.TRAP) {
+                    var obj = new Trap(pos, world);
+                } else if (maze[col][row] == GameObj.BLOCK) {
+                    obj = new Block(pos, world);
+                } else if (maze[col][row] == GameObj.SPINNER_CW) {
+                    obj = new Spinner(pos, world, 'cw');
                     objects.push(obj);
-                } else if (maze[col][row] == MazeEnum.SPINNER_CCW) {
-                    obj = new soft_eng.Spinner(pos, world, 'ccw');
+                } else if (maze[col][row] == GameObj.SPINNER_CCW) {
+                    obj = new Spinner(pos, world, 'ccw');
                     objects.push(obj);
-                } else if (maze[col][row] == MazeEnum.BLOCKER) {
+                } else if (maze[col][row] == GameObj.BLOCKER) {
                     var dir = {x: 1e-2, y: 0};
-                    obj = new soft_eng.Blocker(pos, world, dir);
+                    obj = new Blocker(pos, world, dir);
                     objects.push(obj);
-				} else if (maze[col][row] == MazeEnum.BUMPER) {
-                    obj = new soft_eng.Bumper(pos, world);
-				} else if (maze[col][row] == MazeEnum.ENEMY_BALL) {
-                    obj = new soft_eng.EnemyBall(pos, world);
+				} else if (maze[col][row] == GameObj.BUMPER) {
+                    obj = new Bumper(pos, world);
+				} else if (maze[col][row] == GameObj.ENEMY_BALL) {
+                    obj = new EnemyBall(pos, world);
                 }
                 layer.appendChild(obj.sprite);
             }
@@ -185,14 +185,14 @@ soft_eng.Game = function(director, level) {
                         }
                         ball.body.SetAwake(true);
                         var ballPos = ball.body.GetWorldCenter();
-                        ball.sprite.setPosition(ballPos.x * soft_eng.SCALE, ballPos.y * soft_eng.SCALE);
+                        ball.sprite.setPosition(ballPos.x * SCALE, ballPos.y * SCALE);
                         //ball.body.m_force.SetZero(); // ClearForces
                         //ball.body.m_torque = 0.0; // ClearForces
                     }
                     for (var o in objects) {
 						if (false) {
 						// only need instanceof if there's some weird scoping issue
-						//} else if (objects[o] instanceof soft_eng.Spinner) {
+						//} else if (objects[o] instanceof Spinner) {
 						} else {
 							objects[o].update();
 						}
@@ -233,7 +233,7 @@ soft_eng.Game = function(director, level) {
 	var options = { frequency: 40 }; // this should be some multiple of the frame rate (in ms, rather than fraction) (24x12=288)
 	var watchID = navigator.accelerometer.watchAcceleration(onAccelerometerSuccess, onAccelerometerError, options);
 
-	world.SetContactListener(new soft_eng.WorldListener(this));
+	world.SetContactListener(new WorldListener(this));
 	
 	var dispose = function() {
 		lime.scheduleManager.unschedule(worldStep, this);
@@ -255,18 +255,18 @@ soft_eng.Game = function(director, level) {
 		
 		// use this instead (Ripple doesn't emulate notifications)
 		alert('You have solved the maze in: ' + elapsedSeconds + ' seconds.\nTrapped ' + self.timesTrapped + " times.");
-		newLevel = new soft_eng.Game(self.director, ++level).getScene();
-		soft_eng.director.replaceScene(newLevel);		
+		newLevel = new Game(self.director, ++level).getScene();
+		director.replaceScene(newLevel);		
 	};
 	// this controls what to do when a button is pressed (could be multiple actions based on the button choice)
 	var onLevelFinishedAlertConfirm = function(button) {
 		if (button == 2) {
 			// new level
-			newLevel = new soft_eng.Game(self.director, ++level).getScene();
-			soft_eng.director.replaceScene(newLevel);
+			newLevel = new Game(self.director, ++level).getScene();
+			director.replaceScene(newLevel);
 		}
 		if (button == 1) {
-			soft_eng.loadMainMenu();
+			MainMenu.loadMainMenu();
 		}
 	};
 	
@@ -279,7 +279,7 @@ soft_eng.Game = function(director, level) {
 		//'Quit,Continue'          		// actions. this can be 'Continue,Quit,etc..'
 		//);
 		if (confirm('Are you sure that you want to quit?')) {
-			soft_eng.loadMainMenu();
+			MainMenu.loadMainMenu();
 		}
 	};
 	
@@ -287,7 +287,7 @@ soft_eng.Game = function(director, level) {
 		//this.director.setPaused(false);
 		if (button == 1) {
 			//dispose();
-			soft_eng.loadMainMenu();
+			loadMainMenu();
 		}
 	};
 	

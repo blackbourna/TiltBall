@@ -1,10 +1,10 @@
-goog.provide('soft_eng.Spinner');
+goog.provide('Spinner');
 
-soft_eng.Spinner = function(pos, world, angularVelocity) {
+Spinner = function(pos, world, angularVelocity) {
     this.cw = 5;
     this.ccw = -5;
 	var self = this;
-	var cellSize = soft_eng.Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
+	var cellSize = Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
 	
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = 0.1;
@@ -22,7 +22,7 @@ soft_eng.Spinner = function(pos, world, angularVelocity) {
 	this.body.CreateFixture(this.fixDef);
 	
 	// add a tag to the body object to represent the maze object type (goal, block, trap, ball)
-	var data = { "tag": MazeEnum.BLOCK, "angularVelocity": (angularVelocity == 'cw' ? this.cw : this.ccw)};
+	var data = { "tag": GameObj.BLOCK, "angularVelocity": (angularVelocity == 'cw' ? this.cw : this.ccw)};
 	this.body.SetUserData(data);
 	this.update = function() {
 		this.body.SetAngularVelocity(this.body.GetUserData().angularVelocity);
@@ -38,6 +38,6 @@ soft_eng.Spinner = function(pos, world, angularVelocity) {
 	}
 	this.sprite = (new lime.Sprite)
 		.setFill('assets/pillars.png')
-		.setSize(cellSize * soft_eng.SCALE/4, cellSize * soft_eng.SCALE)
-		.setPosition(this.body.GetWorldCenter().x * soft_eng.SCALE, this.body.GetWorldCenter().y * soft_eng.SCALE);
+		.setSize(cellSize * SCALE/4, cellSize * SCALE)
+		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
 }

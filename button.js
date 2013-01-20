@@ -1,5 +1,5 @@
 //set main namespace
-goog.provide('soft_eng.Button');
+goog.provide('Button');
 
 // get requirements
 goog.require('lime.GlossyButton');
@@ -11,18 +11,18 @@ goog.require('lime.GlossyButton');
 * @constructor
 * @extends lime.Button
 */
-soft_eng.Button = function(txt) {
+Button = function(txt) {
     lime.GlossyButton.call(this, txt);
 
     this.borderWidth = 2;
     this.setColor('#000');
 };
-goog.inherits(soft_eng.Button, lime.GlossyButton);
+goog.inherits(Button, lime.GlossyButton);
 
 /**
 * @inheritDoc
 */
-soft_eng.Button.prototype.makeState_ = function() {
+Button.prototype.makeState_ = function() {
     var state = new lime.RoundedRect().setFill('#fff').setRadius(7);
     state.inner = new lime.RoundedRect().setRadius(7);
     state.label = new lime.Label().setAlign('center').
@@ -36,7 +36,7 @@ soft_eng.Button.prototype.makeState_ = function() {
 /**
 * @inheritDoc
 */
-soft_eng.Button.prototype.setColor = function(clr) {
+Button.prototype.setColor = function(clr) {
     clr = lime.fill.parse(clr);
     goog.array.forEach([this.upstate, this.downstate], function(s) {
         var c = s == this.downstate ? clr.clone().addBrightness(.1) : clr;

@@ -1,6 +1,6 @@
-goog.provide('soft_eng.WorldListener');
+goog.provide('WorldListener');
 
-soft_eng.WorldListener = function(game) {
+WorldListener = function(game) {
 	var self = this;
     this.game = game;
     self.wallhitsnd = new Media('/android_asset/www/assets/wallhit.wav');
@@ -26,31 +26,31 @@ soft_eng.WorldListener = function(game) {
 		if (device.platform.indexOf("Android") > -1) {
 			//navigator.notification.vibrate(50);
 		}
-		if (contactDataA == MazeEnum.BALL) {
-			if (contactDataB == MazeEnum.TRAP) {
+		if (contactDataA == GameObj.BALL) {
+			if (contactDataB == GameObj.TRAP) {
                 var ballData = contact.GetFixtureA().GetBody().GetUserData();
                 ballData.flaggedForDeletion = true;
                 game.timesTrapped++;
                 self.trapsnd.seekTo(0);
                 self.trapsnd.play();
-			} else if (contactDataB == MazeEnum.GOAL) {
+			} else if (contactDataB == GameObj.GOAL) {
 				var ballData = contact.GetFixtureA().GetBody().GetUserData();
                 ballData.flaggedForDeletion = true;
                 ballData.hasReachedTheGoal = true;
                 self.goalsnd.seekTo(0);
                 self.goalsnd.play();
-			} else if (contactDataA == MazeEnum.BLOCK && contactDataB == MazeEnum.BLOCKER) {
+			} else if (contactDataA == GameObj.BLOCK && contactDataB == GameObj.BLOCKER) {
 				alert('test');
 				var body = contact.GetFixtureB().GetBody();
 				var blockerData = body.GetUserData();
 				blockerData.dir.x *= -1;
 				blockerData.dir.y *= -1;
 				body.SetUserData(blockerData);
-			} else if (contactDataA == MazeEnum.BLOCKER && contactDataB == MazeEnum.BLOCK) {
+			} else if (contactDataA == GameObj.BLOCKER && contactDataB == GameObj.BLOCK) {
 				alert('test2');
 			} else {
             }
-		} else if (contactDataA == MazeEnum.BLOCK) {
+		} else if (contactDataA == GameObj.BLOCK) {
             if (impulse.normalImpulses[0] < 0.05) return;
             //console.log(impulse.normalImpulses[0]);
             self.wallhitsnd.seekTo(0);

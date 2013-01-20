@@ -22,17 +22,17 @@ goog.require('lime.Scene');
 goog.require('lime.fill.LinearGradient');
 goog.require('lime.Label');
 
-goog.require('soft_eng.Button');
-goog.require('soft_eng.Game');
-goog.require('soft_eng.Help');
+goog.require('Button');
+goog.require('Game');
+goog.require('Help');
 
 
-soft_eng.WIDTH = 320;
-soft_eng.HEIGHT = 460;
+WIDTH = 320;
+HEIGHT = 460;
 
 
 // entrypoint
-soft_eng.start = function(){
+start = function(){
 	// The watch id references the current `watchAcceleration`
 	var watchID = null;
 	// Wait for PhoneGap to load
@@ -83,8 +83,8 @@ soft_eng.start = function(){
 
 
 	//director
-	soft_eng.director = new lime.Director(document.body, soft_eng.WIDTH, soft_eng.HEIGHT);
-	soft_eng.director.makeMobileWebAppCapable();
+	director = new lime.Director(document.body, WIDTH, HEIGHT);
+	director.makeMobileWebAppCapable();
 
 	var gamescene = new lime.Scene();
 
@@ -93,7 +93,7 @@ soft_eng.start = function(){
 	gamescene.appendChild(layer);
 
 	// set active scene
-	soft_eng.director.replaceScene(gamescene);
+	director.replaceScene(gamescene);
 
 	//debugging labels
 	var xLabel = new lime.Label('x: ').setAnchorPoint(0, 0).setPosition(20, 20);
@@ -115,8 +115,8 @@ soft_eng.start = function(){
 	function initGame() {
 		var gravity = new box2d.Vec2(0, 0);
 		var bounds = new box2d.AABB();
-		bounds.minVertex.Set(-soft_eng.WIDTH, -soft_eng.HEIGHT);
-		bounds.maxVertex.Set(2*soft_eng.WIDTH,2*soft_eng.HEIGHT);
+		bounds.minVertex.Set(-WIDTH, -HEIGHT);
+		bounds.maxVertex.Set(2*WIDTH,2*HEIGHT);
 		world = new box2d.World(bounds, gravity, false);
 
 		// ball Sprite (lime)
@@ -132,7 +132,7 @@ soft_eng.start = function(){
 		ballCircle.friction = 1;
 		// ballBody Object (box2d)
 		var ballBody = new box2d.BodyDef;
-		ballBody.position.Set( soft_eng.WIDTH/2, soft_eng.HEIGHT/2 );
+		ballBody.position.Set( WIDTH/2, HEIGHT/2 );
 		//ballBody.angularDamping = .001;
 		ballBody.AddShape(ballCircle);
 		// add ball objects to world
@@ -286,4 +286,4 @@ soft_eng.start = function(){
 
 
 //this is required for outside access after code is compiled in ADVANCED_COMPILATIONS mode
-goog.exportSymbol('soft_eng.start', soft_eng.start);
+goog.exportSymbol('start', start);
