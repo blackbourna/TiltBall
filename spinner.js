@@ -24,6 +24,18 @@ soft_eng.Spinner = function(pos, world, angularVelocity) {
 	// add a tag to the body object to represent the maze object type (goal, block, trap, ball)
 	var data = { "tag": MazeEnum.BLOCK, "angularVelocity": (angularVelocity == 'cw' ? this.cw : this.ccw)};
 	this.body.SetUserData(data);
+	this.update = function() {
+		this.body.SetAngularVelocity(this.body.GetUserData().angularVelocity);
+		this.body.SetAwake(true);
+		var angle = this.body.GetAngle()*180/Math.PI;
+		while (angle <= 0) {
+			angle += 360;
+		}
+		while (angle >= 360) {
+			angle -= 360;
+		}
+		this.sprite.setRotation(angle);
+	}
 	this.sprite = (new lime.Sprite)
 		.setFill('assets/pillars.png')
 		.setSize(cellSize * soft_eng.SCALE/4, cellSize * soft_eng.SCALE)

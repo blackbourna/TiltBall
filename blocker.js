@@ -24,6 +24,12 @@ soft_eng.Blocker = function(pos, world, dir)
 	// add a tag to the body object to represent the maze object type (goal, block, trap, ball)
 	var data = { "tag": MazeEnum.BLOCKER, "dir": dir };
 	this.body.SetUserData(data);
+	this.update = function() {
+		var dir = data.dir;
+		this.body.ApplyImpulse(dir, this.body.GetWorldCenter());
+		var center = this.body.GetWorldCenter();
+		this.sprite.setPosition(center.x * soft_eng.SCALE, center.y * soft_eng.SCALE);
+	}
 	this.sprite = (new lime.Sprite)
 		.setFill('assets/pillars.png')
 		.setSize(cellSize * soft_eng.SCALE, cellSize * soft_eng.SCALE)

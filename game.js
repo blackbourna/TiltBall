@@ -19,18 +19,9 @@ soft_eng.Game = function(director, level) {
     var deviceName = navigator.userAgent.toLowerCase();
     
     var FRAME_RATE = 60;
-    /*
-    if (deviceName.indexOf('nexus 7') > -1) {
-        FRAME_RATE = 16;
-    } else if (deviceName.indexOf('samsung-sgh') > -1) {
-        FRAME_RATE = 45;
-    }
-    * */
-    
-    //if (level % Levels.length == Levels.length - 1) {
+
     if (level % Levels.length == 2) {
         soft_eng.SCALE = 30.0;
-        //FRAME_RATE /= 2;
     } else {
         soft_eng.SCALE = 60.0;
     }
@@ -68,9 +59,6 @@ soft_eng.Game = function(director, level) {
 	layer.setPosition(0, 0);
 	scene.appendChild(layer);
 	
-	//backgroundSprite = new lime.Sprite().setSize(soft_eng.WIDTH, soft_eng.HEIGHT).setFill('#a5ff00').setAnchorPoint(0,0);
-	//layer.appendChild(backgroundSprite);
-    
     var addBackgroundToScene = function (scene) {
 		var bgSize = 32;
 
@@ -102,9 +90,7 @@ soft_eng.Game = function(director, level) {
     
     var balls = [];
     var goal = null;
-    var traps = [];
-    var spinners = [];
-    var blockers = [];
+    var objects = [];
     
     this.timesTrapped = 0;
     
@@ -126,9 +112,6 @@ soft_eng.Game = function(director, level) {
                 balls.splice(x, 1);
             }
         }
-        //if (balls.length > 0) {
-        //    lime.scheduleManager.setDisplayRate(1000/FRAME_RATE/balls.length);
-        //}
     }
 	var startGame = function() {
         console.log("Entering Maze loop");
@@ -139,54 +122,31 @@ soft_eng.Game = function(director, level) {
                 var pos = {};
                 pos.x = row * cellSize + cellSize/2;
                 pos.y = col * cellSize + cellSize/2;
+                var obj;
                 if (maze[col][row] == MazeEnum.BALL) {
-                    // Ball
                     self.addBall(pos);
                 } else if (maze[col][row] == MazeEnum.GOAL) {
-                    // Goal (Stationary)
                     obj = new soft_eng.Goal(pos, world);
-                    layer.appendChild(obj.sprite);
                 } else if (maze[col][row] == MazeEnum.TRAP) {
-                    // Trap (Stationary)
                     var obj = new soft_eng.Trap(pos, world);
-                    layer.appendChild(obj.sprite);
-                    
-                    // TODO add trap holes to an array to be checked in the game loop (whether the ball went into a trap hole)
-                    
                 } else if (maze[col][row] == MazeEnum.BLOCK) {
-                    // Block (Stationary)
-                    var obj = new soft_eng.Block(pos, world);
-                    // block Sprite (lime)
-                    layer.appendChild(obj.sprite);
+                    obj = new soft_eng.Block(pos, world);
                 } else if (maze[col][row] == MazeEnum.SPINNER_CW) {
-                    // Spinner
-                    var obj = new soft_eng.Spinner(pos, world, 'cw');
-                    // block Sprite (lime)
-                    spinners.push(obj);
-                    layer.appendChild(obj.sprite);
+                    obj = new soft_eng.Spinner(pos, world, 'cw');
+                    objects.push(obj);
                 } else if (maze[col][row] == MazeEnum.SPINNER_CCW) {
-                    // Spinner
-                    var obj = new soft_eng.Spinner(pos, world, 'ccw');
-                    // block Sprite (lime)
-                    spinners.push(obj);
-                    layer.appendChild(obj.sprite);
+                    obj = new soft_eng.Spinner(pos, world, 'ccw');
+                    objects.push(obj);
                 } else if (maze[col][row] == MazeEnum.BLOCKER) {
-                    // Blocker
                     var dir = {x: 1e-2, y: 0};
-                    var obj = new soft_eng.Blocker(pos, world, dir);
-                    blockers.push(obj);
-                    layer.appendChild(obj.sprite);
+                    obj = new soft_eng.Blocker(pos, world, dir);
+                    objects.push(obj);
 				} else if (maze[col][row] == MazeEnum.BUMPER) {
-                    // bumper
-                    var obj = new soft_eng.Bumper(pos, world);
-                    
-                    layer.appendChild(obj.sprite);
+                    obj = new soft_eng.Bumper(pos, world);
 				} else if (maze[col][row] == MazeEnum.ENEMY_BALL) {
-                    // enemy ball
-                    var obj = new soft_eng.EnemyBall(pos, world);
-                    
-                    layer.appendChild(obj.sprite);
+                    obj = new soft_eng.EnemyBall(pos, world);
                 }
+                layer.appendChild(obj.sprite);
             }
         }
         console.log("Exiting Maze loop");
@@ -214,7 +174,6 @@ soft_eng.Game = function(director, level) {
 					prevAcceleration = { x: newGravity.x, y: newGravity.y };
 					world.SetGravity(newGravity); // set the world's gravity, the ball will move accordingly
 
-                    // set the ball sprite's position and attach to ball object
                     for (var b in balls) {
                         var ball = balls[b];
                         if (ball.body.GetUserData().flaggedForDeletion) {
@@ -230,38 +189,13 @@ soft_eng.Game = function(director, level) {
                         //ball.body.m_force.SetZero(); // ClearForces
                         //ball.body.m_torque = 0.0; // ClearForces
                     }
-                    for (var s in spinners) {
-                        var spinner = spinners[s];
-                        spinner.body.SetAngularVelocity(spinner.body.GetUserData().angularVelocity);
-                        spinner.body.SetAwake(true);
-                        var angle = spinner.body.GetAngle()*180/Math.PI;
-                        while (angle <= 0) {
-                            angle += 360;
-                        }
-                        while (angle >= 360) {
-                            angle -= 360;
-                        }
-                        spinner.sprite.setRotation(angle);
-                        //spinner.body.m_force.SetZero(); // ClearForces
-                        //spinner.body.m_torque = 0.0; // ClearForces
-                    }
-                    for (var b in blockers) {
-						var blocker = blockers[b];
-						
-						//var pos = blocker.body.GetPosition();
-						//console.log("pos: " + pos.x + " " + pos.y);
-						//
-						var blockerData = blocker.body.GetUserData();
-						//
-						//var angle = blocker.body.GetAngle();
-						//blocker.body.SetPositionAndAngle({
-						//	x: pos.x + blockerData.dir.x, 
-						//	y: pos.y + blockerData.dir.y
-						//}, angle);
-						var dir = blockerData.dir;
-						blocker.body.ApplyImpulse(dir, blocker.body.GetWorldCenter());
-						var center = blocker.body.GetWorldCenter();
-						blocker.sprite.setPosition(center.x * soft_eng.SCALE, center.y * soft_eng.SCALE);
+                    for (var o in objects) {
+						if (false) {
+						// only need instanceof if there's some weird scoping issue
+						//} else if (objects[o] instanceof soft_eng.Spinner) {
+						} else {
+							objects[o].update();
+						}
 					}
                     world.ClearForces(); // too expensive - we only have a few moving bodies
                 }
@@ -276,7 +210,6 @@ soft_eng.Game = function(director, level) {
 				setTimeout(levelFinishedAlert, 1000);
 				
 			}
-			//console.log("balls.length = " + balls.length);
         };
         
         //lime.scheduleManager.schedule(worldStep, this);
