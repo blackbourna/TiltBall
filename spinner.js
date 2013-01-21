@@ -4,7 +4,7 @@ Spinner = function(pos, world, angularVelocity, length) {
 	var self = this;
 	var cellSize = Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
 	if (!length) {
-		length = 0.9;
+		length = 0.8;
 	}
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = 0.1;

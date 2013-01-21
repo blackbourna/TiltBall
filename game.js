@@ -41,7 +41,6 @@ Game = function(director, level) {
 		SPINNER_CCW: 6,
 		BLOCKER: 7,
 		BUMPER: 8,
-		ENEMY_BALL: 9,
 		RED_KEY: 10,
 		RED_LOCK: 11,
 		BLUE_KEY: 12,
@@ -161,10 +160,10 @@ Game = function(director, level) {
                     obj = new Spinner(pos, world, -5, null);
                     objects.push(obj);
                 } else if (maze[col][row] == GameObj.SLOW_SPINNER_CW) {
-                    obj = new Spinner(pos, world, 2, 2);
+                    obj = new Spinner(pos, world, 2, 2.5);
                     objects.push(obj);
                 } else if (maze[col][row] == GameObj.SLOW_SPINNER_CCW) {
-                    obj = new Spinner(pos, world, -2, 2);
+                    obj = new Spinner(pos, world, -2, 2.5);
                     objects.push(obj);
                 } else if (maze[col][row] == GameObj.BLOCKER) {
                     var dir = {x: 1e-2, y: 0};
@@ -194,7 +193,9 @@ Game = function(director, level) {
                     obj = new KeyLock(pos, world, self, false, "#FFFF00");
 					objects.push(obj);
                 }
-                layer.appendChild(obj.sprite);
+				if (obj) {
+					layer.appendChild(obj.sprite);
+				}
             }
         }
         console.log("Exiting Maze loop");
