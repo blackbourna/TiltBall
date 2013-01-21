@@ -47,7 +47,9 @@ Game = function(director, level) {
 		BLUE_KEY: 12,
 		BLUE_LOCK: 13,
 		YELLOW_KEY: 14,
-		YELLOW_LOCK: 15
+		YELLOW_LOCK: 15,
+		SLOW_SPINNER_CW: 16, 
+		SLOW_SPINNER_CCW: 17
 	};
 	
 	b2Vec2 = Box2D.Common.Math.b2Vec2;
@@ -153,10 +155,16 @@ Game = function(director, level) {
                 } else if (maze[col][row] == GameObj.BLOCK) {
                     obj = new Block(pos, world);
                 } else if (maze[col][row] == GameObj.SPINNER_CW) {
-                    obj = new Spinner(pos, world, 'cw');
+                    obj = new Spinner(pos, world, 5, null);
                     objects.push(obj);
                 } else if (maze[col][row] == GameObj.SPINNER_CCW) {
-                    obj = new Spinner(pos, world, 'ccw');
+                    obj = new Spinner(pos, world, -5, null);
+                    objects.push(obj);
+                } else if (maze[col][row] == GameObj.SLOW_SPINNER_CW) {
+                    obj = new Spinner(pos, world, 2, 2);
+                    objects.push(obj);
+                } else if (maze[col][row] == GameObj.SLOW_SPINNER_CCW) {
+                    obj = new Spinner(pos, world, -2, 2);
                     objects.push(obj);
                 } else if (maze[col][row] == GameObj.BLOCKER) {
                     var dir = {x: 1e-2, y: 0};
