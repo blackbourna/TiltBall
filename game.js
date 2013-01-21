@@ -1,15 +1,18 @@
 goog.provide('Game');
 
+goog.require("lime.animation.FadeTo");
+goog.require("lime.animation.Sequence");
+
 goog.require('Ball');
 goog.require('Goal');
 goog.require('Trap');
 goog.require('Block');
 goog.require('Bumper');
 goog.require('Blocker');
+goog.require('KeyLock');
 goog.require('EnemyBall');
 goog.require('Spinner');
 goog.require('Constants');
-goog.require('WorldListener');
 goog.require('WorldListener');
 goog.require("Levels");
 
@@ -29,18 +32,23 @@ Game = function(director, level) {
 	var startDate = new Date();
 	// maze object type enum
 	GameObj = {
-		"EMPTY": 0, 
-		"BALL": 1, 
-		"GOAL": 2, 
-		"TRAP": 3, 
-		"BLOCK": 4, 
-		"SPINNER_CW": 5, 
-		"SPINNER_CCW": 6,
-		"BLOCKER": 7,
-		"BUMPER": 8,
-		"ENEMY_BALL": 9
-		//"CRANK"
-		};
+		EMPTY: 0, 
+		BALL: 1, 
+		GOAL: 2, 
+		TRAP: 3, 
+		BLOCK: 4, 
+		SPINNER_CW: 5, 
+		SPINNER_CCW: 6,
+		BLOCKER: 7,
+		BUMPER: 8,
+		ENEMY_BALL: 9,
+		RED_KEY: 10,
+		RED_LOCK: 11,
+		BLUE_KEY: 12,
+		BLUE_LOCK: 13,
+		YELLOW_KEY: 14,
+		YELLOW_LOCK: 15
+	};
 	
 	b2Vec2 = Box2D.Common.Math.b2Vec2;
 	b2BodyDef = Box2D.Dynamics.b2BodyDef;
@@ -65,15 +73,16 @@ Game = function(director, level) {
 		for (var x = 0; x < WIDTH + bgSize; x += bgSize) {
 			for (var y = 0; y < HEIGHT + bgSize; y += bgSize) {
 				var bgSprite = new lime.Sprite()
-					.setSize(bgSize, bgSize)
+					.setSize(bgSize + 2, bgSize + 2)
 					.setFill("assets/tile.png")
 					.setAnchorPoint(0, 0)
-					.setPosition(x, y);
+					.setPosition(x - 1, y - 1);
 				scene.appendChild(bgSprite);
 			}
 		}
 	}
     addBackgroundToScene(layer);
+	scene.setRenderer(lime.Renderer.CANVAS);
 
 	//debugging labels
 	var xLabel = new lime.Label('').setAnchorPoint(0, 0).setPosition(20, 20);
@@ -93,6 +102,18 @@ Game = function(director, level) {
     var objects = [];
     
     this.timesTrapped = 0;
+	var locked = [];
+	this.setUnlocked = function(color) {
+		locked.push(color);
+	}
+	this.isUnlocked = function(color) {
+		for (var c in locked) {
+			if (locked[c] == color) {
+				return true;
+			}
+		}
+		return false;
+	}
     
 	this.director = director;
     this.getScene = function() { return scene; };
@@ -101,7 +122,7 @@ Game = function(director, level) {
         // Ball
         var b = new Ball(pos, world);
         balls.push(b);
-        lime.scheduleManager.setDisplayRate(1000/FRAME_RATE/balls.length);
+        //lime.scheduleManager.setDisplayRate(1000/FRAME_RATE/balls.length);
         layer.appendChild(b.sprite);
     };
     this.removeBall = function(ball) {
@@ -145,6 +166,25 @@ Game = function(director, level) {
                     obj = new Bumper(pos, world);
 				} else if (maze[col][row] == GameObj.ENEMY_BALL) {
                     obj = new EnemyBall(pos, world);
+					objects.push(obj);
+				} else if (maze[col][row] == GameObj.RED_KEY) {
+                    obj = new KeyLock(pos, world, self, true, "#FF0000");
+					objects.push(obj);
+				} else if (maze[col][row] == GameObj.RED_LOCK) {
+                    obj = new KeyLock(pos, world, self, false, "#FF0000");
+					objects.push(obj);
+				} else if (maze[col][row] == GameObj.BLUE_KEY) {
+                    obj = new KeyLock(pos, world, self, true, "#0000FF");
+					objects.push(obj);
+				} else if (maze[col][row] == GameObj.BLUE_LOCK) {
+                    obj = new KeyLock(pos, world, self, false, "#0000FF");
+					objects.push(obj);
+				} else if (maze[col][row] == GameObj.YELLOW_KEY) {
+                    obj = new KeyLock(pos, world, self, true, "#FFFF00");
+					objects.push(obj);
+				} else if (maze[col][row] == GameObj.YELLOW_LOCK) {
+                    obj = new KeyLock(pos, world, self, false, "#FFFF00");
+					objects.push(obj);
                 }
                 layer.appendChild(obj.sprite);
             }
@@ -190,12 +230,7 @@ Game = function(director, level) {
                         //ball.body.m_torque = 0.0; // ClearForces
                     }
                     for (var o in objects) {
-						if (false) {
-						// only need instanceof if there's some weird scoping issue
-						//} else if (objects[o] instanceof Spinner) {
-						} else {
-							objects[o].update();
-						}
+						objects[o].update();
 					}
                     world.ClearForces(); // too expensive - we only have a few moving bodies
                 }
@@ -212,8 +247,8 @@ Game = function(director, level) {
 			}
         };
         
-        //lime.scheduleManager.schedule(worldStep, this);
-        lime.scheduleManager.scheduleWithDelay(worldStep, this, 1/FRAME_RATE*1000/24);
+        lime.scheduleManager.schedule(worldStep, this);
+        //lime.scheduleManager.scheduleWithDelay(worldStep, this, 1/FRAME_RATE*1000/24);
     };
 	
 	
@@ -297,5 +332,25 @@ Game = function(director, level) {
 	
 	console.log("Exiting Game loop");
 	console.log("end");
+	var overlay = new lime.RoundedRect()
+		.setFill("#000000")
+		.setSize(WIDTH, HEIGHT)
+		.setAnchorPoint(0, 0)
+		.setOpacity(0)
+		.setPosition(0, 0);
+
+	this.flashScreen = function() {
+		var s = 0.08;
+		var sequence = new lime.animation.Sequence(
+			new lime.animation.FadeTo(1.0).setDuration(s),
+			new lime.animation.FadeTo(0.0).setDuration(s),
+			new lime.animation.FadeTo(1.0).setDuration(s),
+			new lime.animation.FadeTo(0.0).setDuration(s),
+			new lime.animation.FadeTo(1.0).setDuration(s),
+			new lime.animation.FadeTo(0.0).setDuration(s)
+		);
+		overlay.runAction(sequence);
+	}
+	scene.appendChild(overlay);
     startGame();
 }

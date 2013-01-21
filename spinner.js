@@ -11,7 +11,7 @@ Spinner = function(pos, world, angularVelocity) {
 	this.fixDef.friction = 0.3;
 	this.fixDef.restitution = 0.0;
 	this.fixDef.shape = new b2PolygonShape;
-	this.fixDef.shape.SetAsBox(cellSize/4, cellSize/2);
+	this.fixDef.shape.SetAsBox(cellSize/4, cellSize);
 	
 	this.bodyDef = new b2BodyDef();
 	this.bodyDef.type = b2Body.b2_kinematicBody; // walls don't move
@@ -38,6 +38,6 @@ Spinner = function(pos, world, angularVelocity) {
 	}
 	this.sprite = (new lime.Sprite)
 		.setFill('assets/pillars.png')
-		.setSize(cellSize * SCALE/4, cellSize * SCALE)
+		.setSize(cellSize * SCALE/4, cellSize * SCALE * 2)
 		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
 }

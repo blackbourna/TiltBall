@@ -10,7 +10,8 @@ EnemyBall = function(pos, world)
 	this.fixDef.friction = 1;
 	this.fixDef.restitution = 1;
 	this.fixDef.shape = new b2PolygonShape;
-	this.fixDef.shape.SetAsBox(cellSize/2, cellSize/2);
+	var size = cellSize;
+	this.fixDef.shape.SetAsBox(size, size);
 	
 	this.bodyDef = new b2BodyDef();
 	this.bodyDef.type = b2Body.b2_dynamicBody; // walls don't move
@@ -23,8 +24,13 @@ EnemyBall = function(pos, world)
 	// add a tag to the body object to represent the maze object type (goal, block, trap, ball)
 	var data = { "tag": GameObj.ENEMY_BALL };
 	this.body.SetUserData(data);
-	this.sprite = (new lime.Sprite)
-		.setFill('assets/ball.png')
-		.setSize(cellSize * SCALE, cellSize * SCALE)
+	this.body.SetBullet(true);
+	this.update = function() {
+		var center = this.body.GetWorldCenter();
+		this.sprite.setPosition(center.x * SCALE, center.y * SCALE);
+	}
+	this.sprite = new lime.Circle()
+		.setFill('#ffffff')
+		.setSize(2*size * SCALE, 2*size * SCALE)
 		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
 }
