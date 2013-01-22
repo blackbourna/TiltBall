@@ -25,7 +25,7 @@ Block = function(pos, world)
 	this.body.SetBullet(true);
 	this.body.SetUserData(data);
 	this.sprite = (new lime.Sprite)
-		.setFill('assets/pillars.png')
+		.setFill('assets/block.png')
 		.setSize(cellSize * SCALE, cellSize * SCALE)
 		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
 }

@@ -1,9 +1,12 @@
 goog.provide('Game');
 
 goog.require("lime.animation.FadeTo");
+goog.require("lime.animation.Delay");
 goog.require("lime.animation.Sequence");
+goog.require("lime.RoundedRect");
 
 goog.require('Ball');
+goog.require('Bell');
 goog.require('Goal');
 goog.require('Trap');
 goog.require('Block');
@@ -41,6 +44,7 @@ Game = function(director, level) {
 		SPINNER_CCW: 6,
 		BLOCKER: 7,
 		BUMPER: 8,
+		BELL: 9,
 		RED_KEY: 10,
 		RED_LOCK: 11,
 		BLUE_KEY: 12,
@@ -75,7 +79,7 @@ Game = function(director, level) {
 			for (var y = 0; y < HEIGHT + bgSize; y += bgSize) {
 				var bgSprite = new lime.Sprite()
 					.setSize(bgSize + 2, bgSize + 2)
-					.setFill("assets/tile.png")
+					.setFill("assets/tile_blue.png")
 					.setAnchorPoint(0, 0)
 					.setPosition(x - 1, y - 1);
 				scene.appendChild(bgSprite);
@@ -165,6 +169,8 @@ Game = function(director, level) {
                 } else if (maze[col][row] == GameObj.SLOW_SPINNER_CCW) {
                     obj = new Spinner(pos, world, -2, 2.5);
                     objects.push(obj);
+                } else if (maze[col][row] == GameObj.BELL) {
+                    obj = new Bell(pos, world);
                 } else if (maze[col][row] == GameObj.BLOCKER) {
                     var dir = {x: 1e-2, y: 0};
                     obj = new Blocker(pos, world, dir);
@@ -187,10 +193,10 @@ Game = function(director, level) {
                     obj = new KeyLock(pos, world, self, false, "#0000FF");
 					objects.push(obj);
 				} else if (maze[col][row] == GameObj.YELLOW_KEY) {
-                    obj = new KeyLock(pos, world, self, true, "#FFFF00");
+                    obj = new KeyLock(pos, world, self, true, "#00FFFF");
 					objects.push(obj);
 				} else if (maze[col][row] == GameObj.YELLOW_LOCK) {
-                    obj = new KeyLock(pos, world, self, false, "#FFFF00");
+                    obj = new KeyLock(pos, world, self, false, "#00FFFF");
 					objects.push(obj);
                 }
 				if (obj) {
@@ -351,6 +357,7 @@ Game = function(director, level) {
 	this.flashScreen = function() {
 		var s = 0.08;
 		var sequence = new lime.animation.Sequence(
+			//new lime.animation.Delay().setDuration(2),
 			new lime.animation.FadeTo(1.0).setDuration(s),
 			new lime.animation.FadeTo(0.0).setDuration(s),
 			new lime.animation.FadeTo(1.0).setDuration(s),

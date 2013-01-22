@@ -2,7 +2,7 @@ goog.provide('Bumper');
 
 Bumper = function(pos, world)
 {
-	var radius = 0.3;
+	var radius = 0.2;
 	var self = this;
 	var cellSize = Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
 	
@@ -24,7 +24,7 @@ Bumper = function(pos, world)
 	var data = { "tag": GameObj.BUMPER };
 	this.body.SetUserData(data);
 	this.sprite = (new lime.Sprite)
-		.setFill('assets/ball.png')
+		.setFill('assets/cushion.png')
 		.setSize(radius * SCALE, radius * SCALE)
 		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
 }

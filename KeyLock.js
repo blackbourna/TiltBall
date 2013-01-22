@@ -9,11 +9,7 @@ KeyLock = function(pos, world, game, isKey, color) {
 	this.fixDef.friction = 0.3;
 	this.fixDef.restitution = 0.0;
 	this.fixDef.shape = new b2PolygonShape;
-	if (isKey) {
-		this.fixDef.shape.SetAsBox(cellSize/8, cellSize/8);
-	} else {
-		this.fixDef.shape.SetAsBox(cellSize/2, cellSize/2);
-	}
+	this.fixDef.shape.SetAsBox(cellSize/2, cellSize/2);
 	
 	this.bodyDef = new b2BodyDef();
 	this.bodyDef.type = b2Body.b2_staticBody; // walls don't move
@@ -27,20 +23,31 @@ KeyLock = function(pos, world, game, isKey, color) {
 	this.update = function() {
 		if (game.isUnlocked(color)) {
 			world.DestroyBody(this.body);
-			this.sprite.setOpacity(0);
+			this.sprite.runAction(new lime.animation.FadeTo(0).setDuration(0.1));
 		}
 	}
+	this.sprite = new lime.Sprite()
+		.setFill('assets/block_grey.png')
+		.setSize(cellSize * SCALE, cellSize * SCALE)
+		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
+	var sprite2 = null;
 	if (isKey) {
-		this.sprite = new lime.RoundedRect()
-			.setFill(color)
-			.setSize(cellSize/2 * SCALE, cellSize/2 * SCALE)
-			.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
+		sprite2 = new lime.Sprite()
+			.setFill('assets/key.png')
+			.setSize(cellSize * SCALE, cellSize * SCALE);
 	} else {
-		this.sprite = new lime.RoundedRect()
-			.setFill(color)
-			.setSize(cellSize * SCALE, cellSize * SCALE)
-			.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
+		sprite2 = new lime.Sprite()
+			.setFill('assets/lock.png')
+			.setSize(cellSize * SCALE, cellSize * SCALE);
 	}
+	this.sprite.appendChild(sprite2);
+	var spriteOverlay = new lime.RoundedRect()
+		.setFill(color)
+		.setRadius(0)
+		.setOpacity(0.4)
+		.setSize(cellSize * SCALE, cellSize * SCALE)
+		.setPosition(0, 0);
+	this.sprite.appendChild(spriteOverlay);
 	var data = { isKey: isKey, isKeyLock: true, "color": color };
 	this.body.SetUserData(data);
 }
