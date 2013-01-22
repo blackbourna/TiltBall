@@ -634,7 +634,6 @@ if (typeof(Box2D.Dynamics.Joints) === "undefined") Box2D.Dynamics.Joints = {};
       if (this.constructor === b2RevoluteJointDef) this.b2RevoluteJointDef.apply(this, arguments);
    };
    Box2D.Dynamics.Joints.b2RevoluteJointDef = b2RevoluteJointDef;
-
    function b2WeldJoint() {
       b2WeldJoint.b2WeldJoint.apply(this, arguments);
       if (this.constructor === b2WeldJoint) this.b2WeldJoint.apply(this, arguments);

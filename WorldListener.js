@@ -19,6 +19,7 @@ WorldListener = function(game) {
 	}
 	listener.PreSolve = function(contact, oldManifold) {
 		var contactDataA = contact.GetFixtureA().GetBody().GetUserData();
+		if (!contactDataA) return;
 		if (contactDataA.isKey) {
 			var color = contactDataA.color;
 			game.setUnlocked(color);
@@ -26,8 +27,9 @@ WorldListener = function(game) {
 		}
 	}
 	listener.PostSolve = function(contact, impulse) {
-		var contactDataA = contact.GetFixtureA().GetBody().GetUserData().tag;
-		var contactDataB = contact.GetFixtureB().GetBody().GetUserData().tag;
+		var contactDataA = contact.GetFixtureA().GetBody().GetUserData();
+		var contactDataB = contact.GetFixtureB().GetBody().GetUserData();
+		if (!contactDataA) return;
 		//console.log(device.platform);
 		// don't think you can call vibrate here b/c it's during the step
 		var hasSnd = (device.platform.indexOf("Android") > -1);
@@ -35,8 +37,8 @@ WorldListener = function(game) {
 			//navigator.notification.vibrate(50);
 			
 		}
-		if (contactDataA == GameObj.BALL) {
-			if (contactDataB == GameObj.TRAP) {
+		if (contactDataA.tag == GameObj.BALL) {
+			if (contactDataB.tag == GameObj.TRAP) {
                 var ballData = contact.GetFixtureA().GetBody().GetUserData();
                 ballData.flaggedForDeletion = true;
                 game.timesTrapped++;
@@ -44,7 +46,7 @@ WorldListener = function(game) {
 					self.trapsnd.seekTo(0);
 					self.trapsnd.play();
 				}
-			} else if (contactDataB == GameObj.GOAL) {
+			} else if (contactDataB.tag == GameObj.GOAL) {
 				var ballData = contact.GetFixtureA().GetBody().GetUserData();
                 ballData.flaggedForDeletion = true;
                 ballData.hasReachedTheGoal = true;
@@ -53,7 +55,7 @@ WorldListener = function(game) {
 					self.goalsnd.play();
 				}
 			}
-		} else if (contactDataA == GameObj.BLOCK) {
+		} else if (contactDataA.tag == GameObj.BLOCK) {
             if (impulse.normalImpulses[0] < 0.05) return;
             //console.log(impulse.normalImpulses[0]);
 			if (hasSnd) {
@@ -62,6 +64,5 @@ WorldListener = function(game) {
 			}
         }
 	}
-
 	return listener;
 }

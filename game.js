@@ -15,6 +15,7 @@ goog.require('Blocker');
 goog.require('KeyLock');
 goog.require('EnemyBall');
 goog.require('Spinner');
+goog.require('PointSpinner');
 goog.require('Constants');
 goog.require('WorldListener');
 goog.require("Levels");
@@ -52,7 +53,8 @@ Game = function(director, level) {
 		YELLOW_KEY: 14,
 		YELLOW_LOCK: 15,
 		SLOW_SPINNER_CW: 16, 
-		SLOW_SPINNER_CCW: 17
+		SLOW_SPINNER_CCW: 17,
+		POINT_SPINNER: 18
 	};
 	
 	b2Vec2 = Box2D.Common.Math.b2Vec2;
@@ -168,6 +170,10 @@ Game = function(director, level) {
                     objects.push(obj);
                 } else if (maze[col][row] == GameObj.SLOW_SPINNER_CCW) {
                     obj = new Spinner(pos, world, -2, 2.5);
+                    objects.push(obj);
+                } else if (maze[col][row] == GameObj.POINT_SPINNER) {
+                    obj = new PointSpinner(pos, world);
+					layer.appendChild(obj.blockSprite);
                     objects.push(obj);
                 } else if (maze[col][row] == GameObj.BELL) {
                     obj = new Bell(pos, world);

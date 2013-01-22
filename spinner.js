@@ -6,6 +6,7 @@ Spinner = function(pos, world, angularVelocity, length) {
 	if (!length) {
 		length = 0.8;
 	}
+	
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = 0.01;
 	this.fixDef.friction = 0.3;

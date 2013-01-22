@@ -24,8 +24,7 @@ Ball = function(pos, world) {
 	var data = { "tag": GameObj.BALL, "startingPosition": this.startingPosition, "ball": this, "flaggedForDeletion": false, "hasReachedTheGoal": false };
 	this.body.SetUserData(data);
 	this.body.SetBullet(true);
-	
-	this.sprite = (new lime.Circle)
+	this.sprite = new lime.Sprite()
 		.setFill("assets/ball.png")
 		.setSize(radius * SCALE, radius * SCALE);
 }
