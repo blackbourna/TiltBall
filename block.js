@@ -6,7 +6,7 @@ Block = function(pos, world)
 	var cellSize = Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
 	
 	this.fixDef = new b2FixtureDef;
-	this.fixDef.density = 1;
+	this.fixDef.density = 10;
 	this.fixDef.friction = 0.3;
 	this.fixDef.restitution = 0.0;
 	this.fixDef.shape = new b2PolygonShape;

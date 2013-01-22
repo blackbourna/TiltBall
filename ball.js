@@ -6,7 +6,7 @@ Ball = function(pos, world) {
 	
 	this.circleDef = new b2FixtureDef();
 	this.circleDef.shape = new b2CircleShape(radius/2);
-	this.circleDef.density = 1;
+	this.circleDef.density = 5;
 	this.circleDef.restitution = 0.25;
 	this.circleDef.friction = 0.0;
 

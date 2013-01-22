@@ -7,7 +7,7 @@ Spinner = function(pos, world, angularVelocity, length) {
 		length = 0.8;
 	}
 	this.fixDef = new b2FixtureDef;
-	this.fixDef.density = 0.1;
+	this.fixDef.density = 0.01;
 	this.fixDef.friction = 0.3;
 	this.fixDef.restitution = 0.0;
 	this.fixDef.shape = new b2PolygonShape;
