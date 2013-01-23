@@ -1,5 +1,7 @@
 goog.provide('Game');
 
+goog.require("goog.events.KeyHandler");
+
 goog.require("lime.animation.FadeTo");
 goog.require("lime.animation.Delay");
 goog.require("lime.animation.Sequence");
@@ -27,7 +29,7 @@ Game = function(director, level) {
     
     var FRAME_RATE = 60;
 
-    if (level % Levels.length == 2) {
+    if (level % Levels.length == 3) {
         SCALE = 30.0;
     } else {
         SCALE = 60.0;
@@ -56,7 +58,7 @@ Game = function(director, level) {
 		SLOW_SPINNER_CCW: 17,
 		POINT_SPINNER: 18
 	};
-	
+	var useKeyboard = false;
 	b2Vec2 = Box2D.Common.Math.b2Vec2;
 	b2BodyDef = Box2D.Dynamics.b2BodyDef;
 	b2Body = Box2D.Dynamics.b2Body;
@@ -141,6 +143,61 @@ Game = function(director, level) {
             }
         }
     }
+	// http://stackoverflow.com/questions/12317040/box2dwebEMPTY-walls-dont-bounce-a-slow-object
+	//Box2D.Common.b2Settings.b2_velocityThreshold = 0.0;
+	// game loop
+	var accumulator = 0;
+	var worldStep = function(dt) {
+		var deltatime = dt/1000;
+		accumulator += deltatime;
+		timestep = 1/FRAME_RATE;
+		while (accumulator > timestep) {
+			world.Step(timestep, 5);
+			
+			if (!useKeyboard && ballAcceleration.x && ballAcceleration.y) {
+				var factor = 1;
+				var newGravity = {};
+				if (prevAcceleration.x && prevAcceleration.y) {
+					newGravity.x = (-ballAcceleration.x * factor) + prevAcceleration.x * (1-factor); // x is backwards
+					newGravity.y = (ballAcceleration.y * factor) +  prevAcceleration.y * (1-factor);
+				} else {
+					newGravity = { x: ballAcceleration.x*factor * -1, y: ballAcceleration.y*factor }; // remove y*-1 for production
+				}
+				prevAcceleration = { x: newGravity.x, y: newGravity.y };
+				world.SetGravity(newGravity); // set the world's gravity, the ball will move accordingly
+			}
+			for (var b in balls) {
+				var ball = balls[b];
+				if (ball.body.GetUserData().flaggedForDeletion) {
+					if (!ball.body.GetUserData().hasReachedTheGoal) {
+						self.addBall(ball.startingPosition);
+					}
+					self.removeBall(ball);
+					continue;
+				}
+				ball.body.SetAwake(true);
+				var ballPos = ball.body.GetWorldCenter();
+				ball.sprite.setPosition(ballPos.x * SCALE, ballPos.y * SCALE);
+				//ball.body.m_force.SetZero(); // ClearForces
+				//ball.body.m_torque = 0.0; // ClearForces
+			}
+			for (var o in objects) {
+				objects[o].update();
+			}
+			world.ClearForces(); // too expensive - we only have a few moving bodies
+			accumulator -= timestep;
+		}
+		// game end check
+		if (!balls.length) {
+			lime.scheduleManager.unschedule(worldStep, this);
+			navigator.accelerometer.clearWatch(watchID);
+			watchID = null;
+			goog.events.unlisten(keyhandler, 'key', keyevents);
+			setTimeout(levelFinishedAlert, 1000);
+			
+		}
+	};
+	
 	var startGame = function() {
         console.log("Entering Maze loop");
         var cellSize = Constants.cellSize;
@@ -212,61 +269,6 @@ Game = function(director, level) {
         }
         console.log("Exiting Maze loop");
         console.log("Entering Game loop");
-        // http://stackoverflow.com/questions/12317040/box2dwebEMPTY-walls-dont-bounce-a-slow-object
-        //Box2D.Common.b2Settings.b2_velocityThreshold = 0.0;
-        // game loop
-        var accumulator = 0;
-        var worldStep = function(dt) {
-            var deltatime = dt/1000;
-            accumulator += deltatime;
-            timestep = 1/FRAME_RATE;
-            while (accumulator > timestep) {
-                world.Step(timestep, 5);
-                
-                if (ballAcceleration.x && ballAcceleration.y) {
-                    var factor = 1;
-                    var newGravity = {};
-                    if (prevAcceleration.x && prevAcceleration.y) {
-						newGravity.x = (-ballAcceleration.x * factor) + prevAcceleration.x * (1-factor); // x is backwards
-						newGravity.y = (ballAcceleration.y * factor) +  prevAcceleration.y * (1-factor);
-					} else {
-						newGravity = { x: ballAcceleration.x*factor * -1, y: ballAcceleration.y*factor }; // remove y*-1 for production
-					}
-					prevAcceleration = { x: newGravity.x, y: newGravity.y };
-					world.SetGravity(newGravity); // set the world's gravity, the ball will move accordingly
-
-                    for (var b in balls) {
-                        var ball = balls[b];
-                        if (ball.body.GetUserData().flaggedForDeletion) {
-                            if (!ball.body.GetUserData().hasReachedTheGoal) {
-                                self.addBall(ball.startingPosition);
-                            }
-                            self.removeBall(ball);
-                            continue;
-                        }
-                        ball.body.SetAwake(true);
-                        var ballPos = ball.body.GetWorldCenter();
-                        ball.sprite.setPosition(ballPos.x * SCALE, ballPos.y * SCALE);
-                        //ball.body.m_force.SetZero(); // ClearForces
-                        //ball.body.m_torque = 0.0; // ClearForces
-                    }
-                    for (var o in objects) {
-						objects[o].update();
-					}
-                    world.ClearForces(); // too expensive - we only have a few moving bodies
-                }
-                accumulator -= timestep;
-            }
-            // game end check
-			if (!balls.length) {
-				lime.scheduleManager.unschedule(worldStep, this);
-				navigator.accelerometer.clearWatch(watchID);
-				watchID = null;
-				
-				setTimeout(levelFinishedAlert, 1000);
-				
-			}
-        };
         
         lime.scheduleManager.schedule(worldStep, this);
         //lime.scheduleManager.scheduleWithDelay(worldStep, this, 1/FRAME_RATE*1000/24);
@@ -293,6 +295,7 @@ Game = function(director, level) {
 	
 	var dispose = function() {
 		lime.scheduleManager.unschedule(worldStep, this);
+		goog.events.unlisten(keyhandler, 'key', keyevents);
 		navigator.accelerometer.clearWatch(watchID);
 		watchID = null;
 	};
@@ -301,49 +304,17 @@ Game = function(director, level) {
 	var levelFinishedAlert = function() {
 		endDate = new Date();
 		elapsedSeconds = (endDate - startDate)/1000;
-		
-		//navigator.notification.confirm(
-		//'You have solved the maze in: ' + elapsedSeconds + ' seconds.\nTrapped ' + self.timesTrapped + " times.", // message
-		//onLevelFinishedAlertConfirm, // callback
-		//'Well done!',            	// title
-		//'Quit,Continue'          		// actions. this can be 'Continue,Quit,etc..'
-		//);
-		
-		// use this instead (Ripple doesn't emulate notifications)
+
 		alert('You have solved the maze in: ' + elapsedSeconds + ' seconds.\nTrapped ' + self.timesTrapped + " times.");
+		dispose();
 		newLevel = new Game(self.director, ++level).getScene();
 		director.replaceScene(newLevel);		
 	};
-	// this controls what to do when a button is pressed (could be multiple actions based on the button choice)
-	var onLevelFinishedAlertConfirm = function(button) {
-		if (button == 2) {
-			// new level
-			newLevel = new Game(self.director, ++level).getScene();
-			director.replaceScene(newLevel);
-		}
-		if (button == 1) {
-			MainMenu.loadMainMenu();
-		}
-	};
 	
 	var showMenu = function() {
-		//this.director.setPaused(true);
-		//navigator.notification.confirm(
-		//'Are you sure that you want to quit?', // message
-		//continueGame, // callback
-		//'Game Paused',            	// title
-		//'Quit,Continue'          		// actions. this can be 'Continue,Quit,etc..'
-		//);
 		if (confirm('Are you sure that you want to quit?')) {
 			MainMenu.loadMainMenu();
-		}
-	};
-	
-	var continueGame = function(button) {
-		//this.director.setPaused(false);
-		if (button == 1) {
-			//dispose();
-			loadMainMenu();
+			dispose();
 		}
 	};
 	
@@ -374,5 +345,32 @@ Game = function(director, level) {
 		overlay.runAction(sequence);
 	}
 	scene.appendChild(overlay);
+	var keyhandler = new goog.events.KeyHandler(document);
+	keyevents = function(e) {
+		var keyCodes = goog.events.KeyCodes;
+		var keyCode = e.keyCode;
+		useKeyboard = true;
+		var newGravity = world.GetGravity();
+		switch (keyCode) {
+			case keyCodes.UP:
+				newGravity.y -= 1;
+			break;
+			case keyCodes.DOWN:
+				newGravity.y += 1;
+			break;
+			case keyCodes.LEFT:
+				newGravity.x -= 1;
+			break;
+			case keyCodes.RIGHT:
+				newGravity.x += 1;
+			break;
+			case keyCodes.SPACE:
+				newGravity = {x: 0, y: 0};
+			break;
+		}
+		world.SetGravity(newGravity)
+		console.log(world.GetGravity());
+	}
+	goog.events.listen(keyhandler, 'key', keyevents);
     startGame();
 }
