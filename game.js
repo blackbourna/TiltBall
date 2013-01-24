@@ -3,6 +3,7 @@ goog.provide('Game');
 goog.require("goog.events.KeyHandler");
 
 goog.require("lime.animation.FadeTo");
+goog.require("lime.animation.ScaleTo");
 goog.require("lime.animation.Delay");
 goog.require("lime.animation.Sequence");
 goog.require("lime.RoundedRect");
@@ -244,22 +245,22 @@ Game = function(director, level) {
                     obj = new EnemyBall(pos, world);
 					objects.push(obj);
 				} else if (maze[col][row] == GameObj.RED_KEY) {
-                    obj = new KeyLock(pos, world, self, true, "#FF0000");
+                    obj = new KeyLock(pos, world, self, true, "red");
 					objects.push(obj);
 				} else if (maze[col][row] == GameObj.RED_LOCK) {
-                    obj = new KeyLock(pos, world, self, false, "#FF0000");
+                    obj = new KeyLock(pos, world, self, false, "red");
 					objects.push(obj);
 				} else if (maze[col][row] == GameObj.BLUE_KEY) {
-                    obj = new KeyLock(pos, world, self, true, "#0000FF");
+                    obj = new KeyLock(pos, world, self, true, "blue");
 					objects.push(obj);
 				} else if (maze[col][row] == GameObj.BLUE_LOCK) {
-                    obj = new KeyLock(pos, world, self, false, "#0000FF");
+                    obj = new KeyLock(pos, world, self, false, "blue");
 					objects.push(obj);
 				} else if (maze[col][row] == GameObj.YELLOW_KEY) {
-                    obj = new KeyLock(pos, world, self, true, "#00FFFF");
+                    obj = new KeyLock(pos, world, self, true, "yellow");
 					objects.push(obj);
 				} else if (maze[col][row] == GameObj.YELLOW_LOCK) {
-                    obj = new KeyLock(pos, world, self, false, "#00FFFF");
+                    obj = new KeyLock(pos, world, self, false, "yellow");
 					objects.push(obj);
                 }
 				if (obj) {
@@ -332,14 +333,14 @@ Game = function(director, level) {
 		.setPosition(0, 0);
 
 	this.flashScreen = function() {
-		var s = 0.08;
+		var s = 0.1;
 		var sequence = new lime.animation.Sequence(
-			//new lime.animation.Delay().setDuration(2),
-			new lime.animation.FadeTo(1.0).setDuration(s),
+			new lime.animation.Delay().setDuration(0.25),
+			new lime.animation.FadeTo(0.5).setDuration(s),
 			new lime.animation.FadeTo(0.0).setDuration(s),
-			new lime.animation.FadeTo(1.0).setDuration(s),
+			new lime.animation.FadeTo(0.5).setDuration(s),
 			new lime.animation.FadeTo(0.0).setDuration(s),
-			new lime.animation.FadeTo(1.0).setDuration(s),
+			new lime.animation.FadeTo(0.5).setDuration(s),
 			new lime.animation.FadeTo(0.0).setDuration(s)
 		);
 		overlay.runAction(sequence);

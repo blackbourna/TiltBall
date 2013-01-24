@@ -22,8 +22,8 @@ WorldListener = function(game) {
 		if (!contactDataA) return;
 		if (contactDataA.isKey) {
 			var color = contactDataA.color;
-			game.setUnlocked(color);
 			game.flashScreen();
+			game.setUnlocked(color);
 		}
 	}
 	listener.PostSolve = function(contact, impulse) {

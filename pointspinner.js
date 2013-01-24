@@ -1,10 +1,13 @@
 goog.provide("PointSpinner");
 
-PointSpinner = function(pos, world) {
+PointSpinner = function(pos, world, scaleY) {
 	var self = this;
 	var cellSize = Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
 	if (!length) {
 		length = 0.8;
+	}
+	if (!scaleY) {
+		scaleY = 1;
 	}
 	
 	// setup block
@@ -35,7 +38,7 @@ PointSpinner = function(pos, world) {
 	this.fixDef.friction = 1;
 	this.fixDef.restitution = 0.0;
 	this.fixDef.shape = new b2PolygonShape;
-	this.fixDef.shape.SetAsBox(cellSize/4, cellSize * 1.5 * length);
+	this.fixDef.shape.SetAsBox(cellSize/4, cellSize * 1.5 * length * scaleY);
 	
 	this.bodyDef = new b2BodyDef();
 	this.bodyDef.type = b2Body.b2_dynamicBody; // walls don't move
@@ -60,7 +63,7 @@ PointSpinner = function(pos, world) {
 	}
 	this.sprite = (new lime.Sprite)
 		.setFill('assets/pillars.png')
-		.setSize(cellSize * SCALE/4, cellSize * 2 * SCALE* length)
+		.setSize(cellSize * SCALE/4, cellSize * 2 * SCALE* length * scaleY)
 		.setAnchorPoint(0.5, 0)
 		.setPosition(this.dynamicBody.GetWorldCenter().x * SCALE, this.dynamicBody.GetWorldCenter().y * SCALE);
 	// setup revolute joint

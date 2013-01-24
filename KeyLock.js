@@ -1,6 +1,11 @@
 goog.provide('KeyLock');
 
 KeyLock = function(pos, world, game, isKey, color) {
+	var colors = {
+		'red': "FEDBCA",
+		'blue': "#ABCDEF",
+		'yellow': "#009999"
+	}
 	var self = this;
 	var cellSize = Constants.cellSize; // space allocated for each maze block (in a 28x20 maze)
 	this.color = color;
@@ -23,31 +28,22 @@ KeyLock = function(pos, world, game, isKey, color) {
 	this.update = function() {
 		if (game.isUnlocked(color)) {
 			world.DestroyBody(this.body);
-			this.sprite.runAction(new lime.animation.FadeTo(0).setDuration(0.1));
+			this.sprite.runAction(new lime.animation.ScaleTo(0).setDuration(0.1));
 		}
 	}
 	this.sprite = new lime.Sprite()
-		.setFill('assets/block_grey.png')
 		.setSize(cellSize * SCALE, cellSize * SCALE)
 		.setPosition(this.body.GetWorldCenter().x * SCALE, this.body.GetWorldCenter().y * SCALE);
-	var sprite2 = null;
-	if (isKey) {
-		sprite2 = new lime.Sprite()
-			.setFill('assets/key.png')
-			.setSize(cellSize * SCALE, cellSize * SCALE);
-	} else {
-		sprite2 = new lime.Sprite()
-			.setFill('assets/lock.png')
-			.setSize(cellSize * SCALE, cellSize * SCALE);
-	}
-	this.sprite.appendChild(sprite2);
-	var spriteOverlay = new lime.RoundedRect()
-		.setFill(color)
-		.setRadius(0)
-		.setOpacity(0.4)
+	var sprite2 = new lime.Sprite()
 		.setSize(cellSize * SCALE, cellSize * SCALE)
 		.setPosition(0, 0);
-	this.sprite.appendChild(spriteOverlay);
+	if (isKey) {
+		sprite2.setFill('assets/key_'+color+'.png');
+	} else {
+		this.sprite.setFill('assets/block_grey.png');
+		sprite2.setFill('assets/lock_'+color+'.png');
+	}
+	this.sprite.appendChild(sprite2);
 	var data = { isKey: isKey, isKeyLock: true, "color": color };
 	this.body.SetUserData(data);
 }
